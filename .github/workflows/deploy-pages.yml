@@ -1,0 +1,12 @@
+Supreme-Court-Services/
+│
+├── .github/
+│   └── workflows/
+│       └── deploy-pages.yml     ← PUT IT HERE
+│
+├── public/
+├── src/
+├── index.html
+├── package.json
+├── tsconfig.json
+└── vite.config.ts
