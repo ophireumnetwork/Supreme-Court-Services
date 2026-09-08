@@ -1,0 +1,11 @@
+{
+  "name": "Remix Electronic Notarial Facility Infrastructure (ENFI)",
+  "description": "Enterprise-grade digital trust platform and ecosystem for Remote Online Notarization (RON), cryptographic PAdES sealing, judicial registry compliance, and identity assurance.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
