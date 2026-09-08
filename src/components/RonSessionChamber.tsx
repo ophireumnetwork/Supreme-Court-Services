@@ -63,15 +63,33 @@ export function RonSessionChamber({
     return () => clearInterval(timer);
   }, []);
 
+  // Cleanup media tracks on unmount
+  useEffect(() => {
+    return () => {
+      if (videoRef.current && videoRef.current.srcObject) {
+        try {
+          const stream = videoRef.current.srcObject as MediaStream;
+          stream.getTracks().forEach((t) => t.stop());
+        } catch {
+          // ignore cleanup errors
+        }
+      }
+    };
+  }, []);
+
   // Web camera toggle (real camera or fallback)
   const toggleCamera = async () => {
     if (!cameraActive) {
       try {
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        if (
+          typeof navigator !== 'undefined' &&
+          navigator.mediaDevices &&
+          typeof navigator.mediaDevices.getUserMedia === 'function'
+        ) {
           const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
           if (videoRef.current) {
             videoRef.current.srcObject = stream;
-            videoRef.current.play();
+            videoRef.current.play().catch(() => {});
           }
           setCameraActive(true);
         } else {
@@ -83,8 +101,12 @@ export function RonSessionChamber({
       }
     } else {
       if (videoRef.current && videoRef.current.srcObject) {
-        const stream = videoRef.current.srcObject as MediaStream;
-        stream.getTracks().forEach((t) => t.stop());
+        try {
+          const stream = videoRef.current.srcObject as MediaStream;
+          stream.getTracks().forEach((t) => t.stop());
+        } catch {
+          // ignore track stopping errors
+        }
         videoRef.current.srcObject = null;
       }
       setCameraActive(false);

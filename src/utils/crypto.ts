@@ -4,20 +4,28 @@
 
 export async function computeSha256(text: string): Promise<string> {
   try {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(text);
-    const hashBuffer = await window.crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+    if (
+      typeof window !== 'undefined' &&
+      window.crypto &&
+      window.crypto.subtle &&
+      typeof window.crypto.subtle.digest === 'function'
+    ) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(text);
+      const hashBuffer = await window.crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+    }
   } catch {
     // Fallback pseudo-hash if SubtleCrypto unavailable in certain sandbox contexts
-    let hash = 0;
-    for (let i = 0; i < text.length; i++) {
-      hash = (hash << 5) - hash + text.charCodeAt(i);
-      hash |= 0;
-    }
-    return Math.abs(hash).toString(16).padStart(64, '0');
   }
+
+  let hash = 0;
+  for (let i = 0; i < text.length; i++) {
+    hash = (hash << 5) - hash + text.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash).toString(16).padStart(64, '0');
 }
 
 export function generateRandomHex(length: number): string {
